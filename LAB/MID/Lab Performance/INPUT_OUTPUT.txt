@@ -1,0 +1,68 @@
+  .MODEL SMALL
+  .STACK 100H
+  .DATA
+    
+    A DB 31H
+    B DB 52
+    C DB 'C'
+    D DB ?
+    
+  .CODE
+  MAIN PROC
+    
+    MOV AX,@DATA  ;  TAKING THE DATA
+    MOV DS,AX  
+    
+    MOV AH,2      ; TAKING OUTPUT
+    MOV DL,A
+    INT 21H 
+    
+    MOV AH,2      ; LINE BREAK
+    MOV DL,0AH
+    INT 21H
+    MOV DL,0DH
+    INT 21H
+    
+    MOV AH,2
+    MOV DL,B
+    INT 21H     
+    
+    MOV AH,2      ; LINE BREAK
+    MOV DL,0AH
+    INT 21H
+    MOV DL,0DH
+    INT 21H
+    
+    MOV AH,2
+    MOV DL,C
+    INT 21H      
+    
+    MOV AH,2      ; LINE BREAK
+    MOV DL,0AH
+    INT 21H
+    MOV DL,0DH
+    INT 21H
+    
+    MOV AH,1      ; USER INPUT
+    INT 21H
+    MOV D,AL
+    
+    MOV AH,2      ; LINE BREAK
+    MOV DL,0AH
+    INT 21H
+    MOV DL,0DH
+    INT 21H
+    
+    
+    MOV AH,2
+    MOV DL,D
+    INT 21H
+    
+    
+    MOV AH,4CH    ; PROGRAM TERMINATION
+    INT 21H
+    
+    MAIN ENDP
+  END MAIN
+    
+    
