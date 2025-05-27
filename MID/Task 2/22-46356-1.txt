@@ -1,0 +1,178 @@
+Q1. Write an assembly program where you must take an Alphabet as input (Consider only capital letter). Show if the given alphabet is a vowel or a consonant.
+
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+    VOWEL_MSG DB 'VOWEL$'
+    CONSONANT_MSG DB 'CONSONANT$'
+    CHAR DB ?
+
+.CODE
+MAIN PROC
+START:
+    MOV AX, @DATA
+    MOV DS, AX
+
+    MOV AH, 1
+    INT 21H
+    MOV CHAR, AL  ; Save the input character
+
+    MOV AH, 2     ; New line
+    MOV DL, 10
+    INT 21H
+    MOV DL, 13
+    INT 21H
+    
+   
+    MOV AL, CHAR  ; Check for vowels Lower Case
+    CMP AL, 'a'
+    JE VOWEL
+    CMP AL, 'e'
+    JE VOWEL
+    CMP AL, 'i'
+    JE VOWEL
+    CMP AL, 'o'
+    JE VOWEL
+    CMP AL, 'u'
+    JE VOWEL
+    
+    
+    MOV AL, CHAR   ; Check for vowels Upper Case
+    CMP AL, 'A'
+    JE VOWEL
+    CMP AL, 'E'
+    JE VOWEL
+    CMP AL, 'I'
+    JE VOWEL
+    CMP AL, 'O'
+    JE VOWEL
+    CMP AL, 'U'
+    JE VOWEL     
+
+    ; --- If not a vowel, it's a consonant ---
+    JMP CONSONANT
+
+VOWEL:
+    MOV AH, 9
+    LEA DX, VOWEL_MSG
+    INT 21H
+    JMP EXIT
+
+CONSONANT:
+    MOV AH, 9
+    LEA DX, CONSONANT_MSG
+    INT 21H
+    JMP EXIT
+
+EXIT:
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+END MAIN
+
+
+------------------------------------------------------------------------------------------------
+Q2. Write an assembly program where you must print “I love Bangladesh” 5 times. You have put a value of 5 in CL register. For each printing you must decrease the value of CL by 1 and print it along side with the sentence.
+
+
+.MODEL SMALL
+.STACK 100H
+
+.DATA
+    MSG DB 'I love Bangladesh$'   ; Message to display
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    
+    MOV CL, 5          ; Initialize counter to 5
+
+DISPLAY_LOOP:
+
+    MOV AH, 09H        
+    LEA DX, MSG        
+    INT 21H            
+
+    CALL NEWLINE       ; Create newline
+
+    DEC CL             ; Decrement the counter
+
+    MOV AL, CL         ; Convert CL to ASCII 
+    ADD AL, '0'        
+    MOV DL, AL         
+    MOV AH, 02H        
+    INT 21H
+
+    CALL NEWLINE       ; Create newline
+
+    CMP CL, 0
+    JGE DISPLAY_LOOP   ; loop
+
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+
+NEWLINE PROC           ; Procedure: Newline
+    MOV AH, 02H
+    MOV DL, 13     
+    INT 21H
+    MOV DL, 10     
+    INT 21H
+    RET
+NEWLINE ENDP
+
+END MAIN.MODEL SMALL
+.STACK 100H
+
+.DATA
+    MSG DB 'I love Bangladesh$'   ; Message to display
+
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    
+    MOV CL, 5          ; Initialize counter to 5
+
+DISPLAY_LOOP:
+
+    MOV AH, 09H        
+    LEA DX, MSG        
+    INT 21H            
+
+    CALL NEWLINE       ; Create newline
+
+    DEC CL             ; Decrement the counter
+
+    MOV AL, CL         ; Convert CL to ASCII 
+    ADD AL, '0'        
+    MOV DL, AL         
+    MOV AH, 02H        
+    INT 21H
+
+    CALL NEWLINE       ; Create newline
+
+    CMP CL, 0
+    JGE DISPLAY_LOOP   ; loop
+
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP
+
+NEWLINE PROC           ; Procedure: Newline
+    MOV AH, 02H
+    MOV DL, 13     
+    INT 21H
+    MOV DL, 10     
+    INT 21H
+    RET
+NEWLINE ENDP
+
+END MAIN
