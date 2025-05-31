@@ -1,0 +1,135 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2821
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11780\viewh16380\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 .MODEL SMALL\
+.STACK 100H\
+\
+.DATA\
+    INPUT_MSG       DB 'Input binary number (6 to 16 bits): $'\
+    ONE_MSG         DB 13, 10, 'Number of 1s: $'\
+    ZERO_MSG        DB 13, 10, 'Number of 0s: $'\
+    PARITY_MSG      DB 13, 10, 'Parity Flag: $'\
+    EVEN_MSG        DB '1 (Even parity)$'\
+    ODD_MSG         DB '0 (Odd parity)$'\
+    NEWLINE         DB 13, 10, '$'\
+\
+.CODE\
+MAIN PROC\
+    MOV AX, @DATA\
+    MOV DS, AX\
+\
+    ; Print input message\
+    MOV AH, 9\
+    LEA DX, INPUT_MSG\
+    INT 21H\
+\
+    ; Initialize registers\
+    XOR BX, BX      ; BX stores binary bits\
+    XOR CX, CX      ; CX = bit count\
+    XOR SI, SI      ; SI = count of 1s\
+\
+READ_LOOP:\
+    MOV AH, 1\
+    INT 21H\
+    CMP AL, 0DH     ; Enter key\
+    JE CHECK_LENGTH\
+\
+    AND AL, 0FH     ; Convert ASCII '0'/'1' to binary\
+    SHL BX, 1       ; Shift left to make room\
+    OR BL, AL       ; Add bit\
+    INC CX          ; Bit count\
+\
+    CMP AL, 1\
+    JNE SKIP_ONE\
+    INC SI          ; Count of 1s\
+SKIP_ONE:\
+\
+    CMP CX, 16\
+    JE DISPLAY_RESULT\
+    JMP READ_LOOP\
+\
+CHECK_LENGTH:\
+    CMP CX, 6\
+    JB READ_LOOP    ; If less than 6 bits, continue input\
+\
+DISPLAY_RESULT:\
+    ; Count of 0s = CX - SI\
+    MOV DI, CX\
+    SUB DI, SI\
+\
+    ; Show number of 1s\
+    MOV AH, 9\
+    LEA DX, ONE_MSG\
+    INT 21H\
+    MOV AX, SI\
+    CALL PRINT_NUM\
+\
+    ; Show number of 0s\
+    MOV AH, 9\
+    LEA DX, ZERO_MSG\
+    INT 21H\
+    MOV AX, DI\
+    CALL PRINT_NUM\
+\
+    ; Use TEST instruction to set parity flag\
+    TEST BL, 0FFH   ; Check parity of lower 8 bits\
+\
+    ; Display parity flag\
+    MOV AH, 9\
+    LEA DX, PARITY_MSG\
+    INT 21H\
+\
+    JP ODD_PARITY   ; Jump if Parity = 0 (odd parity)\
+    LEA DX, EVEN_MSG\
+    JMP SHOW_PARITY\
+\
+ODD_PARITY:\
+    LEA DX, ODD_MSG\
+\
+SHOW_PARITY:\
+    MOV AH, 9\
+    INT 21H\
+\
+    ; Exit\
+    MOV AH, 4CH\
+    INT 21H\
+\
+MAIN ENDP\
+\
+; Subroutine to print number in AX (0\'9665535)\
+PRINT_NUM PROC\
+    PUSH AX\
+    PUSH BX\
+    PUSH CX\
+    PUSH DX\
+\
+    MOV CX, 0\
+    MOV BX, 10\
+\
+DIV_LOOP:\
+    XOR DX, DX\
+    DIV BX\
+    PUSH DX\
+    INC CX\
+    CMP AX, 0\
+    JNE DIV_LOOP\
+\
+PRINT_DIGITS:\
+    POP DX\
+    ADD DL, '0'\
+    MOV AH, 2\
+    INT 21H\
+    LOOP PRINT_DIGITS\
+\
+    POP DX\
+    POP CX\
+    POP BX\
+    POP AX\
+    RET\
+PRINT_NUM ENDP\
+\
+END MAIN}
